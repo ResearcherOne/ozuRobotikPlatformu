@@ -1,0 +1,8 @@
+v0.1
+Basarili bir sekilde "tokenList" koleksiyonuna OBJE eklendi.
+
+v0.2
+Basarili bir sekilde koleksiyon find method'u ile veritabanindan cekildi.
+
+v0.3
+Changelog eklendi.
