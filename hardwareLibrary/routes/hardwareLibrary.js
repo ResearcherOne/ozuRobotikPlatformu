@@ -9,7 +9,12 @@ var mongoModule = require('../bin/mongoModule');
 
 router.route('/hardwarelist')
   .get(function (request, response){
-      mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(){console.log("ok.")});
+    mongoModule.getCollection("tokenList", function(err, result)
+    {
+      var resultJSON = JSON.stringify(result);
+      response.send(resultJSON);
+      console.log(resultJSON);
+    });
   });
 
 module.exports = router;
