@@ -11,7 +11,8 @@ var mongoModule = require('./bin/mongoModule');
 //app.use(myMiddleware);
 //app.use('ajax/hardwarelibrary', hardwareLibrary);
 app.get('/', function(request,response){
-  mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(){console.log("ok.")});
+  //mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(err, result){console.log("ok.")});
+  mongoModule.getCollection("tokenList", function(err, result){console.log(JSON.stringify(result))});
   response.send('Hello World!');
   console.log("served successfully");
 });

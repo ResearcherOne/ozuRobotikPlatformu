@@ -20,9 +20,18 @@ mongoClient.connect(url, function(err, db) {
 
 // Public
 module.exports = {
-    getCollection: function(collectionName)
+    getCollection: function(collectionName,callback)
     {
-      return sum(TWO, num);
+      activeDB.collection(collectionName).find().toArray(function(err, result)
+      {
+        if(!err) {
+          console.log("mongoModule: successfully retreived the collection");
+          callback(err, result);
+        } else {
+          console.log("mongoModule: unable to retreive the collection");
+          callback(err, result);
+        }
+      });
     },
     insertObject: function(collectionName, object, callback)
     {
