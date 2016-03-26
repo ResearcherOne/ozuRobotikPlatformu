@@ -47,3 +47,7 @@ module.exports = {
       });
     }
 }
+
+  //mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(err, result){console.log("ok.")});
+  //mongoModule.getCollection("tokenList", function(err, result){console.log(JSON.stringify(result))});
+  

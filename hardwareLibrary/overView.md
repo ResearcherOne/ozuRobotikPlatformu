@@ -1,17 +1,47 @@
 Back-End
 	-Middlewares
 		-Authanticator: (Authanticates and adds userMail parameter to request)
-		-Routes
-
+		
 	-Routes (ozurobotik.com)
 		/ajax
 			/hardwarelibrary
-				hardwarelist (query:hardwareID --all, returns ALL hardwares.)
+				/hardwarelist (query:hardwareID --all, returns ALL hardwares.)
+					/getlist
+					/add
+				/user
+					/borrow
+					/return
 	-Required Modules
-		-mongoModule
-			getCollection(collectionName,callBack)
-		-mailModule
+		Model:
+			-mongoModule (uses mongoDbWrapper)
+				getHardwareCollection(callBack)
+				borrowHardware(user,hardwareID,callback)
+				returnHardware(user,hardwareID,callback)
+				
+				getDueDateList()
+				getCloseDueDateList()
+			-mailerModule (uses sendGridWrapper)
+				sendDueDateMail(user)
+				sendCloseDueDateNotification(user)
+				sendReportToLibrarian(user)
+		Controller:
+			-schedulerModule (functions triggered end of the day)
+				checkDueDates
+				checkCloseDueDates
+				checkReportDay
+			-routes
 
+Data Models
+	Hardware {	
+		name: "Arduino UNO",
+		description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
+		imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
+		tags: ["arduino", "development board", "uno"],
+		total: 4,
+		available: 1,
+		addedDate: "properDateGoesHere",
+		lendData: [{id:"1241231231231", date:"properDateGoesHere"}, {id:"1241231231231", date:"properDateGoesHere"}]
+	}
 
 Client Side
 	-Post: What hardware to request
