@@ -22,8 +22,8 @@ Back-End
 				getCloseDueDateList()
 			-mailerModule (uses sendGridWrapper)
 				sendDueDateMail(user)
-				sendCloseDueDateNotification(user)
-				sendReportToLibrarian(user)
+				sendCloseDueDateNotification(user, dueList)
+				sendReportToLibrarian(user, dueList)
 		Controller:
 			-schedulerModule (functions triggered end of the day)
 				checkDueDates
@@ -32,7 +32,8 @@ Back-End
 			-routes
 
 Data Models
-	Hardware {	
+	Hardware {
+		id: "0"
 		name: "Arduino UNO",
 		description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
 		imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
@@ -40,17 +41,27 @@ Data Models
 		total: 4,
 		available: 1,
 		addedDate: "properDateGoesHere",
-		lendData: [{id:"1241231231231", date:"properDateGoesHere"}, {id:"1241231231231", date:"properDateGoesHere"}]
 	}
-
+	libraryUser {
+		name: "birkan"
+		surname: "kolcu"
+		mail: "birkan.kolcu@ozu.edu.tr"
+		phone: "+90532..."
+		status: "librarian"
+		borrowLimit: 2
+		reputation: 8
+		hardwareBorrowed: [borrowData,borrowData,...]
+	}
+	borrowData {
+		hardwareID:
+		date:
+	}
+	
 Client Side
 	-Post: What hardware to request
 	-Auth: Google Auth.
 	-Get: get Hardware list (as json object)
 
-User(client-side): (???)
-	*Token (Auth.)
-	*mail (ozu edu auth.)
 
 TODO
 otomatik olarak dosyayi zipleyip adindaki versiyonu 0.1 arttiran script yaz.
