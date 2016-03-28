@@ -1,4 +1,4 @@
-Back-End
+#Back-End
 	-Middlewares
 		-Authanticator: (Authanticates and adds userMail parameter to request)
 		
@@ -31,7 +31,7 @@ Back-End
 				checkReportDay
 			-routes
 
-Data Models
+#Data Models
 	Hardware {
 		id: "0"
 		name: "Arduino UNO",
@@ -57,27 +57,27 @@ Data Models
 		date:
 	}
 	
-Client Side
+#Client Side
 	-Post: What hardware to request
 	-Auth: Google Auth.
 	-Get: get Hardware list (as json object)
 
 
-TODO
-otomatik olarak dosyayi zipleyip adindaki versiyonu 0.1 arttiran script yaz.
-stackoverflow'a sormadan once internette arastir. Ardindan MUTLAKA sor
-middleware lerin calisma mantigini daha iyi anlamam gerekiyor.
+#TODO
+	otomatik olarak dosyayi zipleyip adindaki versiyonu 0.1 arttiran script yaz.
+	stackoverflow'a sormadan once internette arastir. Ardindan MUTLAKA sor
+	middleware lerin calisma mantigini daha iyi anlamam gerekiyor.
 
-Changelog:
-v0.1
-*Basarili bir sekilde "tokenList" koleksiyonuna OBJE eklendi.
+#Changelog:
+	v0.1
+	*Basarili bir sekilde "tokenList" koleksiyonuna OBJE eklendi.
 
-v0.2
-*Basarili bir sekilde koleksiyon find method'u ile veritabanindan cekildi.
+	v0.2
+	*Basarili bir sekilde koleksiyon find method'u ile veritabanindan cekildi.
 
-v0.3
-*Changelog eklendi.
+	v0.3
+	*Changelog eklendi.
 
-v0.4
-*Middleware basarili bir sekilde calistirildi.
-*Changelog, overview.md'ye tasindi.
+	v0.4
+	*Middleware basarili bir sekilde calistirildi.
+	*Changelog, overview.md'ye tasindi.
