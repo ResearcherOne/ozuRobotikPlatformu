@@ -1,16 +1,15 @@
 #Back-End
-	-Middlewares
-		-Authanticator: (Authanticates and adds userMail parameter to request)
-		
-	-Routes (ozurobotik.com)
-		/ajax
-			/hardwarelibrary
-				/hardwarelist (query:hardwareID --all, returns ALL hardwares.)
-					/getlist
-					/add
-				/user
-					/borrow
-					/return
+	-Routes
+		/hardwarelibrary
+			/hardwarelist (query:hardwareID --all, returns ALL hardwares.)
+				/getlist
+				/add
+			/user
+				/borrow
+				/return
+			/usermanagement
+				/add
+				/delete
 	-Required Modules
 		Model:
 			-mongoModule (uses mongoDbWrapper)
@@ -30,7 +29,6 @@
 				checkCloseDueDates
 				checkReportDay
 			-routes
-
 #Data Models
 	Hardware {
 		id: "0"
@@ -45,7 +43,7 @@
 	libraryUser {
 		name: "birkan"
 		surname: "kolcu"
-		mail: "birkan.kolcu@ozu.edu.tr"
+		userMail: "birkan.kolcu@ozu.edu.tr"
 		phone: "+90532..."
 		status: "librarian"
 		borrowLimit: 2
@@ -57,16 +55,14 @@
 		date:
 	}
 	
-#Client Side
-	-Post: What hardware to request
-	-Auth: Google Auth.
-	-Get: get Hardware list (as json object)
+#hardwareLibrary API
+	initialize(mongoDBinstance)
+	createUser
+	deleteUser
 
 
 #TODO
-	otomatik olarak dosyayi zipleyip adindaki versiyonu 0.1 arttiran script yaz.
-	stackoverflow'a sormadan once internette arastir. Ardindan MUTLAKA sor
-	middleware lerin calisma mantigini daha iyi anlamam gerekiyor.
+	node_modules'u kaldir (best practice.)
 
 #Changelog:
 	v0.1
@@ -81,3 +77,7 @@
 	v0.4
 	*Middleware basarili bir sekilde calistirildi.
 	*Changelog, overview.md'ye tasindi.
+	
+	v0.5
+	*Authantication, hardwareLibrary uygulamasinin kapsami disinda kaldigi icin authentication işi
+		"ozuRobotikPlatformu" uygulamasina taşındı.
