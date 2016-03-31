@@ -13,6 +13,9 @@
 				/user
 					/borrow
 					/return
+				/usermanagement (this route will be used only when a profile in actual App created/deleted.)
+					/add
+					/delete
 			/authentication
 					/getToken
 					/validateToken

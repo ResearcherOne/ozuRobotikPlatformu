@@ -19,6 +19,10 @@
 				
 				getDueDateList()
 				getCloseDueDateList()
+				
+				addUser()
+				deleteUser()
+				isLibrarian()
 			-mailerModule (uses sendGridWrapper)
 				sendDueDateMail(user)
 				sendCloseDueDateNotification(user, dueList)
