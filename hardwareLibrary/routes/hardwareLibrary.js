@@ -7,8 +7,18 @@ var parseUrlencoded = bodyParser.urlencoded({extended: false});
 var mongoModule = require('../bin/mongoModule');
 //TO BE DELETED
 
-router.route('/hardwarelist')
+router.route('/hardwarelist/getlist')
   .get(function (request, response){
+    mongoModule.getCollection("tokenList", function(err, result)
+    {
+      var resultJSON = JSON.stringify(result);
+      response.send(resultJSON);
+      console.log(resultJSON);
+    });
+  });
+
+router.route('/hardwarelist/addhardware')
+  .post(function (request, response){
     mongoModule.getCollection("tokenList", function(err, result)
     {
       var resultJSON = JSON.stringify(result);

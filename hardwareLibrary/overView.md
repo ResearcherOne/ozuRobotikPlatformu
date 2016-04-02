@@ -3,7 +3,7 @@
 		/hardwarelibrary
 			/hardwarelist (query:hardwareID --all, returns ALL hardwares.)
 				/getlist
-				/add
+				/addhardware
 			/user
 				/borrow
 				/return
@@ -13,9 +13,9 @@
 	-Required Modules
 		Model:
 			-mongoModule (uses mongoDbWrapper)
-				getHardwareCollection(callBack)
-				borrowHardware(user,hardwareID,callback)
-				returnHardware(user,hardwareID,callback)
+				getHardwareList(function(hardwareArray){})
+				borrowHardware(userMail,hardwareID,callback)
+				returnHardware(userMail,hardwareID,callback)
 				
 				getDueDateList()
 				getCloseDueDateList()

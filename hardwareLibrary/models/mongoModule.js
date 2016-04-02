@@ -1,13 +1,46 @@
 /*
-getCollection(collectionName)
+	-mongoModule (uses mongoDbWrapper)
+		getHardwareList(function(hardwareArray){})
+		borrowHardware(userMail,hardwareID,callback)
+		returnHardware(userMail,hardwareID,callback)
+		
+		getDueDateList()
+		getCloseDueDateList()
+		
+		addUser()
+		deleteUser()
+		isLibrarian()
+		
+		
+	getDueDateList: function()
+	{
+		
+	}
+	getCloseDueDateList: function()
+	{
+		
+	}
+	
+	addUser() {
+		
+	}
+	deleteUser() {
+		
+	}
+	isLibrarian(){
+		
+	}
 */
-
 var mongodb = require('mongodb');
 var appConfig = require('../appConfig');
 
 var mongoClient = mongodb.MongoClient;
 var url = appConfig.mongoModule.url;
 var activeDB;
+
+var mongoModuleConfig = {
+	hardwareCollectionName: "hardwareCollection"
+};
 
 mongoClient.connect(url, function(err, db) {
   if(!err) {
@@ -18,9 +51,7 @@ mongoClient.connect(url, function(err, db) {
   }
 });
 
-// Public
-module.exports = {
-    getCollection: function(collectionName,callback)
+function getCollectionAsArray(collectionName,callback)
     {
       activeDB.collection(collectionName).find().toArray(function(err, result)
       {
@@ -32,8 +63,9 @@ module.exports = {
           callback(err, result);
         }
       });
-    },
-    insertObject: function(collectionName, object, callback)
+    }
+
+function insertObject(collectionName, object, callback)
     {
       activeDB.collection(collectionName).insertOne(object, function(err, result)
       {
@@ -46,6 +78,24 @@ module.exports = {
         }
       });
     }
+
+// Public
+module.exports = {
+	getHardwareList: function(callback)
+	{
+		var hardwareList;
+		getCollectionAsArray(mongoModuleConfig.hardwareCollectionName,function(err,result){
+		
+		callback(hardwareList);
+		})
+		
+	},
+	borrowHardware: function(userMail,hardwareID,callback){
+		
+	},
+	returnHardware: function(userMail,hardwareID,callback){
+		
+	}
 }
 
   //mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(err, result){console.log("ok.")});
