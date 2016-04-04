@@ -1,21 +1,21 @@
 #Back-End
 	-Routes
-		/hardwarelibrary
-			/hardwarelist (query:hardwareID --all, returns ALL hardwares.)
-				/getlist
-				/addhardware
-			/user
-				/borrow
-				/return
-			/usermanagement
-				/add
-				/delete
+			/hardwareList (query:hardwareID --all, returns ALL hardwares.)
+				/getList
+				/addHardware
+			/userActions
+				/borrowAction
+				/returnAction
+			/userManagement
+				/addUser
+				/deleteUser
 	-Required Modules
 		Model:
 			-mongoModule (uses mongoDbWrapper)
-				getHardwareList(function(hardwareArray){})
-				borrowHardware(userMail,hardwareID,callback)
-				returnHardware(userMail,hardwareID,callback)
+				getHardwareArray(function(hardwareArray){})				result format: {hardwareList: []}
+				addHardware(userMail,hardwareObject,function(result){})	result format: {result: boolean}
+				borrowHardware(userMail,hardwareID,function(result){}) 	result format: {result: boolean}
+				returnHardware(userMail,hardwareID,callback)			result format: {result: boolean}
 				
 				getDueDateList()
 				getCloseDueDateList()

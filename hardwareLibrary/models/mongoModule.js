@@ -1,6 +1,6 @@
 /*
 	-mongoModule (uses mongoDbWrapper)
-		getHardwareList(function(hardwareArray){})
+		getHardwareArray(function(hardwareArray){})
 		borrowHardware(userMail,hardwareID,callback)
 		returnHardware(userMail,hardwareID,callback)
 		
@@ -81,21 +81,16 @@ function insertObject(collectionName, object, callback)
 
 // Public
 module.exports = {
-	getHardwareList: function(callback)
+	getHardwareArray: function(callback)
 	{
 		var hardwareList;
 		getCollectionAsArray(mongoModuleConfig.hardwareCollectionName,function(err,result){
-		
-		callback(hardwareList);
+			hardwareList = result;
+			callback(hardwareList);
 		})
 		
 	},
-	borrowHardware: function(userMail,hardwareID,callback){
-		
-	},
-	returnHardware: function(userMail,hardwareID,callback){
-		
-	}
+
 }
 
   //mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(err, result){console.log("ok.")});
