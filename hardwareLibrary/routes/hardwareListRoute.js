@@ -1,12 +1,8 @@
 var express = require('express');
-var app = express();
 var router = express.Router();
-//var bodyParser = require('body-parser');
-//var parseUrlencoded = bodyParser.urlencoded({extended: false});
-
 var mongoModule = require('../models/mongoModule');
 
-router.route('/getList')
+router.route('/getlist')
   .get(function (request, response){
 	  mongoModule.getHardwareArray(function(hardwareArray)
     {
@@ -15,7 +11,8 @@ router.route('/getList')
     });
   });
 
-router.route('/addHardware')
+
+router.route('/addhardware')
   .post(function (request, response){
 	var userMail = "birkan.kolcu@ozu.edu.tr";
 	//mongoModule.addHardware(userMail,hardwareObject,function(result){});

@@ -6,8 +6,8 @@ var hardwareLibraryRoute = require('./routes/hardwareLibraryRoute');
 
 app.use(myMiddleware);
 app.use(express.static('public'));
+app.use('/hardwarelibrary', hardwareLibraryRoute);
 
-app.use('/hardwareLibrary', hardwareLibraryRoute);
 
 app.listen(80, function(){
   console.log('Listening on port 80 \n');
