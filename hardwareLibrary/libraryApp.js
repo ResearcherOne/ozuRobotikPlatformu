@@ -6,7 +6,7 @@ var hardwareLibraryRoute = require('./routes/hardwareLibraryRoute');
 
 app.use(myMiddleware);
 app.use(express.static('public'));
-app.use('/hardwarelibrary', hardwareLibraryRoute);
+app.use('/hardwarelibrary', hardwareLibraryRoute); //isAuthenticated middleware will be used
 
 
 app.listen(80, function(){
