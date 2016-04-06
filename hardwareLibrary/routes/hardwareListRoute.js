@@ -12,6 +12,15 @@ router.route('/getlist')
       response.send(JSON.stringify(resultJSON));
     });
   });
+  
+router.route('/testList')
+  .get(function (request, response){
+	  mongoModule.getHardwareArray(function(hardwareArray)
+    {
+      var resultJSON = {hardwareList: hardwareArray}
+	  response.jsonp(resultJSON);
+    });
+  });
 
 /*
 	Hardware {
@@ -25,8 +34,10 @@ router.route('/getlist')
 		addedDate: "properDateGoesHere",
 	}
 */
+
 router.route('/addhardware') //add isLibrarian middleware
-  .post(parseUrlencoded,function (request, response){
+  .post(parseUrlencoded,allowCrossDomain,function (request, response){
+	
 	var userMail = "birkan.kolcu@ozu.edu.tr";
 	var postedHardware = request.body;
 	var newHardware = {
@@ -40,9 +51,13 @@ router.route('/addhardware') //add isLibrarian middleware
 		addedDate: Date.now(),
 	};
 	
-	mongoModule.addHardware(userMail, newHardware, function(result){
-		//	var responseObject = {name: newHardware.name, status: "Successfully added the hardware."};
-		//	response.status(201).json(responseObject);
+	mongoModule.addHardware(userMail, newHardware, function(add_result){
+		if (add_result) {
+			var responseObject = {name: newHardware.name, status: "Successfully added the hardware."}; //should i send messages as status or send true/false and show error accordingly in the front-end
+		} else {
+			var responseObject = {name: newHardware.name, status: "Unable to add the hardware."};
+		}
+		response.status(201).jsonp(responseObject); //should i send json with status code 201 anyway? Or when unsucceed send error? What is best practice.
 	});
   });
 
