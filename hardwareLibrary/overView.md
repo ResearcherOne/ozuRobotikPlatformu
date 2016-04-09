@@ -13,6 +13,7 @@
 		Model:
 			-mongoModule (uses mongoDbWrapper)
 				getHardwareArray(function(hardwareArray){})				result format: {hardwareList: []}
+				isHardwareExist()
 				addHardware(userMail,hardwareObject,function(result){})	result format: {result: boolean}
 				borrowHardware(userMail,hardwareID,function(result){}) 	result format: {result: boolean}
 				returnHardware(userMail,hardwareID,callback)			result format: {result: boolean}

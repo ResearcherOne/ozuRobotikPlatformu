@@ -12,15 +12,6 @@ router.route('/getlist')
       response.send(JSON.stringify(resultJSON));
     });
   });
-  
-router.route('/testList')
-  .get(function (request, response){
-	  mongoModule.getHardwareArray(function(hardwareArray)
-    {
-      var resultJSON = {hardwareList: hardwareArray}
-	  response.jsonp(resultJSON);
-    });
-  });
 
 /*
 	Hardware {
@@ -36,12 +27,12 @@ router.route('/testList')
 */
 
 router.route('/addhardware') //add isLibrarian middleware
-  .post(parseUrlencoded,allowCrossDomain,function (request, response){
-	
+  .post(parseUrlencoded, function (request, response){
+	response.header("Access-Control-Allow-Origin", "*");
+	response.header("Access-Control-Allow-Headers", "X-Requested-With");
 	var userMail = "birkan.kolcu@ozu.edu.tr";
 	var postedHardware = request.body;
 	var newHardware = {
-		id: postedHardware.id,
 		name: postedHardware.name,
 		description: postedHardware.description,
 		imageLink: postedHardware.imageLink,
@@ -50,15 +41,22 @@ router.route('/addhardware') //add isLibrarian middleware
 		available: postedHardware.available,
 		addedDate: Date.now(),
 	};
-	
-	mongoModule.addHardware(userMail, newHardware, function(add_result){
-		if (add_result) {
-			var responseObject = {name: newHardware.name, status: "Successfully added the hardware."}; //should i send messages as status or send true/false and show error accordingly in the front-end
-		} else {
-			var responseObject = {name: newHardware.name, status: "Unable to add the hardware."};
-		}
-		response.status(201).jsonp(responseObject); //should i send json with status code 201 anyway? Or when unsucceed send error? What is best practice.
-	});
+	//isLibrarian(userMail)
+		//isHardwareExist
+			mongoModule.addHardware(newHardware, function(add_result){
+				if (add_result) {
+					var responseObject = {result: true, description: "Successfully added the hardware."}; //is sending suh responseObject is among the best practices between front-end backend comminication 
+				} else {
+					var responseObject = {result: false, description: "Unable to add the hardware."};
+				}
+				response.status(201).json(responseObject); //should i send json with status code 201 anyway? Or when unsucceed send error? What is best practice.
+			});
+		/* else
+			var responseObject = {result: false, description: "Hardware with that name already exists in Library."};
+		*/
+	/* else
+			var responseObject = {result: false, description: "Unauthorized person cannot add new hardware."};
+	*/
   });
 
 module.exports = router;
