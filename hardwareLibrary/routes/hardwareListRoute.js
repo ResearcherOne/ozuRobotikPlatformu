@@ -28,11 +28,9 @@ router.route('/getlist')
 
 router.route('/addhardware') //add isLibrarian middleware
   .post(parseUrlencoded, function (request, response){
-	response.header("Access-Control-Allow-Origin", "*");
-	response.header("Access-Control-Allow-Headers", "X-Requested-With");
 	var userMail = "birkan.kolcu@ozu.edu.tr";
 	var postedHardware = request.body;
-	var newHardware = {
+	var newHardware = { //Is what am i going best practice? I thought it would be (somehow) safer to pick right values from incoming data instead of saving as it recieved. 
 		name: postedHardware.name,
 		description: postedHardware.description,
 		imageLink: postedHardware.imageLink,

@@ -8,3 +8,4 @@ module.exports = {
         return sum(module.exports.x, num);
     }
 }
+
