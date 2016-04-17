@@ -81,13 +81,7 @@ function getCollectionAsArray(collectionName,callback)
     {
       activeDB.collection(collectionName).find().toArray(function(err, result)
       {
-        if(!err) {
-          console.log("mongoModule: successfully retreived the collection");
           callback(err, result);
-        } else {
-          console.log("mongoModule: unable to retreive the collection");
-          callback(err, result);
-        }
       });
     }
 
@@ -95,13 +89,7 @@ function insertObject(collectionName, object, callback)
     {
       activeDB.collection(collectionName).insertOne(object, function(err, result)
       {
-        if(!err) {
-          console.log("mongoModule: successfully inserted to the collection");
           callback(err, result);
-        } else {
-          console.log("mongoModule: unable to insert to the collection");
-          callback(err, result);
-        }
       });
     }
 
@@ -112,7 +100,11 @@ module.exports = {
 		var hardwareList;
 		getCollectionAsArray(mongoModuleConfig.hardwareCollectionName,function(err, result){
 			hardwareList = result;
-			callback(hardwareList);
+			if (!err) {
+				callback(false, hardwareList);
+			} else {
+				callback(true, hardwareList);
+			}
 		});
 		
 	},
@@ -121,17 +113,36 @@ module.exports = {
 	{
 		insertObject(mongoModuleConfig.hardwareCollectionName, newHardware, function(err, result){
 			if(!err) {
-			  console.log("mongoModule: new hardware is successfully inserted to the collection");
 			  callback(true);//is returning true/false among the best practices?
 			} else {
-			  console.log("mongoModule: unable to insert new hardware to the collection");
 			  callback(false);
 			}
-		})
+		});
 	},
-
+	
+	isHardwareExist: function(hardwareName, callback) 
+	{
+		activeDB.collection(collectionName).find().toArray(function(err, result)
+		{
+			if (result.length == 0) {
+				callback(false, false);
+			} else {
+				callback(false, true);
+			}
+		});
+	}
 }
 
   //mongoModule.insertObject("tokenList", {"token" : "birkan.kolcu", "status" : "available" }, function(err, result){console.log("ok.")});
   //mongoModule.getCollection("tokenList", function(err, result){console.log(JSON.stringify(result))});
+  
+  /*
+  		activeDB.collection(collectionName).aggregate(
+			 [
+			   { "$match": 		{ "price": hardwareName} },
+			   { "$project": 	{ "_id": false, "vendor_id": true, "grade": true } },
+			   { "$limit": 		{ "_id": "$borough", "count": { $sum: 1 } } }
+			 ]).toArray(function(err, result) {
+		   });
+  */
   

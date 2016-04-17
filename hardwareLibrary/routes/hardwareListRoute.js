@@ -4,9 +4,19 @@ var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({extended: false}); /*{extended: false} option do "force the use of the native querystring Node library"*/
 var mongoModule = require('../models/mongoModule');
 
+router.route('/test123/:hardwarename')
+  .get(function (request, response){
+	  var hardwarename = request.params.hardwarename;
+	  mongoModule.isHardwareExist(hardwarename,function(err, result)
+    {
+      var resultJSON = {hardwareList: result}
+      response.send(JSON.stringify(resultJSON));
+    });
+  });
+
 router.route('/getlist')
   .get(function (request, response){
-	  mongoModule.getHardwareArray(function(hardwareArray)
+	  mongoModule.getHardwareArray(function(err, hardwareArray)
     {
       var resultJSON = {hardwareList: hardwareArray}
       response.send(JSON.stringify(resultJSON));

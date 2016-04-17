@@ -1,14 +1,21 @@
+#Front-End
+	hardwareLibraryPage.js
+		var globalHardwareList
+		appendToMainContainer(hardwareList)
+		clearMainContainer()
+		filterHardwareList(tag, globalHardwareList)
+	
 #Back-End
 	-Routes
-			/hardwareList (query:hardwareID --all, returns ALL hardwares.)
-				/getList
-				/addHardware
-			/userActions
-				/borrowAction
-				/returnAction
-			/userManagement
-				/addUser
-				/deleteUser
+		/hardwareList (query:hardwareID --all, returns ALL hardwares.)
+			/getList
+			/addHardware
+		/userActions
+			/borrowAction
+			/returnAction
+		/userManagement
+			/addUser
+			/deleteUser
 	-Required Modules
 		Model:
 			-mongoModule (uses mongoDbWrapper)
