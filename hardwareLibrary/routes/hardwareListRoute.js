@@ -7,10 +7,14 @@ var mongoModule = require('../models/mongoModule');
 router.route('/test123/:hardwarename')
   .get(function (request, response){
 	  var hardwarename = request.params.hardwarename;
-	  mongoModule.isHardwareExist(hardwarename,function(err, result)
+	  mongoModule.isHardwareExist(hardwarename, function(err,isHardwareExist)
     {
-      var resultJSON = {hardwareList: result}
-      response.send(JSON.stringify(resultJSON));
+		if (isHardwareExist) {
+			var responseObject = {result: true, description: "Hardware already exists."};
+		} else {
+			var responseObject = {result: true, description: "Hardware does not exist."};
+		}
+		response.status(201).json(responseObject);
     });
   });
 
@@ -51,8 +55,8 @@ router.route('/addhardware') //add isLibrarian middleware
 	};
 	//isLibrarian(userMail)
 		//isHardwareExist
-			mongoModule.addHardware(newHardware, function(add_result){
-				if (add_result) {
+			mongoModule.addHardware(newHardware, function(isSuccess){
+				if (isSuccess) {
 					var responseObject = {result: true, description: "Successfully added the hardware."}; //is sending suh responseObject is among the best practices between front-end backend comminication 
 				} else {
 					var responseObject = {result: false, description: "Unable to add the hardware."};

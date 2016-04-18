@@ -122,12 +122,16 @@ module.exports = {
 	
 	isHardwareExist: function(hardwareName, callback) 
 	{
-		activeDB.collection(collectionName).find().toArray(function(err, result)
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).find({name: hardwareName}).toArray(function(err, result)
 		{
-			if (result.length == 0) {
-				callback(false, false);
+			if (!err){
+				if (result.length == 0) {
+					callback(false, false);
+				} else {
+					callback(false, true);
+				}
 			} else {
-				callback(false, true);
+				callback(false, false);
 			}
 		});
 	}
