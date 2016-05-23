@@ -1,62 +1,3 @@
-/*
-	-mongoModule (uses mongoDbWrapper)
-		getHardwareArray(function(hardwareArray){})
-		borrowHardware(userMail,hardwareID,callback)
-		returnHardware(userMail,hardwareID,callback)
-		
-		getDueDateList()
-		getCloseDueDateList()
-		
-		addUser()
-		deleteUser()
-		isLibrarian()
-		
-		
-	getDueDateList: function()
-	{
-		
-	}
-	getCloseDueDateList: function()
-	{
-		
-	}
-	
-	addUser() {
-		
-	}
-	deleteUser() {
-		
-	}
-	isLibrarian(){
-		
-	}
-	
-#Data Models
-	Hardware {
-		id: "0"
-		name: "Arduino UNO",
-		description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
-		imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
-		tags: ["arduino", "development board", "uno"],
-		total: 4,
-		available: 1,
-		addedDate: "properDateGoesHere",
-	}
-	libraryUser {
-		name: "birkan"
-		surname: "kolcu"
-		userMail: "birkan.kolcu@ozu.edu.tr"
-		phone: "+90532..."
-		status: "librarian"
-		borrowLimit: 2
-		reputation: 8
-		hardwareBorrowed: [borrowData,borrowData,...]
-	}
-	borrowData {
-		hardwareID:
-		date:
-	}
-*/
 var mongodb = require('mongodb');
 var appConfig = require('../appConfig');
 
@@ -65,7 +6,8 @@ var url = appConfig.mongoModule.url;
 var activeDB;
 
 var mongoModuleConfig = {
-	hardwareCollectionName: "hardwareCollection"
+	hardwareCollectionName: "hardwareCollection",
+	userCollectionName: "userCollection"
 };
 
 mongoClient.connect(url, function(err, db) {
@@ -78,20 +20,28 @@ mongoClient.connect(url, function(err, db) {
 });
 
 function getCollectionAsArray(collectionName,callback)
-    {
-      activeDB.collection(collectionName).find().toArray(function(err, result)
-      {
-          callback(err, result);
-      });
-    }
+{
+	activeDB.collection(collectionName).find().toArray(function(err, result)
+	{
+		callback(err, result);
+	});
+}
 
 function insertObject(collectionName, object, callback)
-    {
-      activeDB.collection(collectionName).insertOne(object, function(err, result)
-      {
-          callback(err, result);
-      });
-    }
+{
+	activeDB.collection(collectionName).insertOne(object, function(err, result)
+	{
+		callback(err, result);
+	});
+}
+
+function removeObject(collectionName, removeCriteria, callback)
+{
+	activeDB.collection(collectionName).remove(removeCriteria, function(err, result)
+	{
+		callback(err, result);
+	});
+}
 
 // Public
 module.exports = {
@@ -113,9 +63,22 @@ module.exports = {
 	{
 		insertObject(mongoModuleConfig.hardwareCollectionName, newHardware, function(err, result){
 			if(!err) {
-			  callback(true);//is returning true/false among the best practices?
+				callback(true);
 			} else {
-			  callback(false);
+				callback(false);
+			}
+		});
+	},
+	
+	deleteHardware: function(inputHardwareName, callback) 
+	{
+		removeObject(mongoModuleConfig.hardwareCollectionName, { name: inputHardwareName }, function(err, result){
+			if (!err){
+				var isRemoved = result.result.n != 0;;
+				callback(isRemoved);
+			} else {
+				var isRemoved = false;
+				callback(isRemoved);
 			}
 		});
 	},
@@ -125,13 +88,119 @@ module.exports = {
 		activeDB.collection(mongoModuleConfig.hardwareCollectionName).find({name: hardwareName}).toArray(function(err, result)
 		{
 			if (!err){
-				if (result.length == 0) {
-					callback(false, false);
+				var isHardwareExistInCollection = (result.length != 0);
+				callback(isHardwareExistInCollection);
+			} else {
+				var isHardwareExistInCollection = true; //Hata oldugunda database te mevcut cevabi donmek uygun degil.
+				callback(isHardwareExistInCollection);
+			}
+		});
+	},
+	
+	isHardwareAvailable: function(hardwareName, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).find({"name": hardwareName}).toArray(function(err, result)
+		{
+			if (!err){
+				var isHardwareExistInCollection = (result.length != 0);
+				if (isHardwareExistInCollection) {
+					var hardware = result[0];
+					var availableHardwareCount = hardware.available;
+					var isAvailable = (availableHardwareCount > 0);
+					callback (isAvailable);
 				} else {
-					callback(false, true);
+					var isAvailable = false;
+					callback(isAvailable);
 				}
 			} else {
-				callback(false, false);
+				var isAvailable = false;
+				callback(isAvailable);
+			}
+		});
+	},
+	
+	borrowHardware: function(userMail, hardwareName, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available":-1}}, function(err, result) {
+			if (!err){
+				activeDB.collection(mongoModuleConfig.userCollectionName).update({"userMail": userMail}, {"$addToSet" : {"hardwareBorrowed" : {"hardwareName" : hardwareName , 'date' : Date.now()}} }, function(err, result) {
+					if (!err){
+						var isSucceed = true;
+						callback(isSucceed);
+					} else {
+						var isSucceed = false;
+						callback(isSucceed);
+					}
+				});
+			} else {
+				var isSucceed = false;
+				callback(isSucceed);
+			}
+		});
+	},
+	
+	getUserArray: function(callback)
+	{
+		var userList;
+		getCollectionAsArray(mongoModuleConfig.userCollectionName,function(err, result){
+			userList = result;
+			if (!err) {
+				callback(false, userList);
+			} else {
+				callback(true, userList);
+			}
+		});
+		
+	},
+	
+	getUser: function(inputUserMail, callback)
+	{	
+		activeDB.collection(mongoModuleConfig.userCollectionName).find({userMail: inputUserMail}).toArray(function(err, result)
+		{
+			if (result.length != 0){
+				callback(result[0]);
+			} else {
+				callback([]);
+			}
+		});
+	},
+	
+	addUser: function(newUser, callback) 
+	{
+		insertObject(mongoModuleConfig.userCollectionName, newUser, function(err, result){
+			if(!err) {
+				var isSucceed = true;
+				callback(isSucceed);
+			} else {
+				var isSucceed = false;
+				callback(isSucceed);
+			}
+		});
+	},
+	
+	deleteUser: function(inputUserMail, callback) 
+	{
+		removeObject(mongoModuleConfig.userCollectionName, { userMail: inputUserMail }, function(err, result){
+			if (!err){
+				var isRemoved = result.result.n != 0;
+				callback(isRemoved);
+			} else {
+				var isRemoved = false;
+				callback(isRemoved);
+			}
+		});
+	},
+	
+	isUserExist: function(inputUserMail, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.userCollectionName).find({userMail: inputUserMail}).toArray(function(err, result)
+		{
+			if (!err){
+				var isUserExistInDatabase = (result.length != 0);
+				callback(isUserExistInDatabase);
+			} else {
+				var isUserExistInDatabase = true;
+				callback(isUserExistInDatabase);
 			}
 		});
 	}
@@ -149,4 +218,9 @@ module.exports = {
 			 ]).toArray(function(err, result) {
 		   });
   */
+  
+/*
+				getDueDateList()
+				getCloseDueDateList()
+*/
   

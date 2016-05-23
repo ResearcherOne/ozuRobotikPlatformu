@@ -7,10 +7,37 @@
 	</head>		
 	
 	<body>
-		<form>
+		<form id="addHardware">
 			<legend>New Hardware</legend>
 			<input name="name" placeholder="Name"><br/>
 			<input name="description" placeholder="Description">
+			<input name="total" placeholder="Total Hardware Count">
+			<input name="available" placeholder="Available Hardware Count">
+			<input type="Submit">
+		</form>
+		
+		<form id="deleteHardware">
+			<legend>Delete Hardware</legend>
+			<input name="name" placeholder="Hardware Name">
+			<input type="Submit">
+		</form>
+		
+		<form id="addUser">
+			<legend>New User</legend>
+			<input name="fullName" placeholder="Full Name"><br/>
+			<input name="userMail" placeholder="User Mail">
+			<input type="Submit">
+		</form>
+		
+		<form id="deleteUser">
+			<legend>Delete User</legend>
+			<input name="userMail" placeholder="User Mail">
+			<input type="Submit">
+		</form>
+		
+		<form id="borrowHardware">
+			<legend>Borrow Hardware</legend>
+			<input name="name" placeholder="Hardware Name"><br/>
 			<input type="Submit">
 		</form>
 	</body>
