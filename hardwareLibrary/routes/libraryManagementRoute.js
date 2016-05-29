@@ -7,6 +7,7 @@ var parseUrlencoded = bodyParser.urlencoded({extended: false}); /*{extended: fal
 router.route('/adduser')
 	.post(parseUrlencoded, function (request, response){
 		var postedUser = request.body;
+		
 		var libraryUser = {
 			fullName: postedUser.fullName,
 			userMail: postedUser.userMail,
@@ -38,6 +39,7 @@ router.route('/adduser')
 router.route('/deleteuser')
 	.post(parseUrlencoded, function (request, response){
 		var postedData = request.body;
+		
 		mongoModule.isUserExist(postedData.userMail, function(isUserExist){
 			if(isUserExist){
 				mongoModule.deleteUser(postedData.userMail, function(isSuccess){
@@ -68,6 +70,7 @@ router.route('/getusers')
 router.route('/addhardware')
 	.post(parseUrlencoded, function (request, response){
 		var postedHardware = request.body;
+		
 		var newHardware = { //Is what am i going best practice? I thought it would be (somehow) safer to pick right values from incoming data instead of saving as it recieved. 
 			name: postedHardware.name,
 			description: postedHardware.description,
@@ -78,7 +81,7 @@ router.route('/addhardware')
 			addedDate: Date.now(),
 		};
 		mongoModule.isHardwareExist(newHardware.name, function(isHardwareExist){
-			if(!isHardwareExist){
+			if(!isHardwareExist && newHardware.total > 0){
 				mongoModule.addHardware(newHardware, function(isSuccess){
 					var responseObject;
 					if (isSuccess) {
@@ -88,8 +91,14 @@ router.route('/addhardware')
 					}
 					response.json(responseObject);
 				});			
-			} else {
-				var responseObject = {isSucceed: false, description: "Hardware with that name already exists in Library."};
+			} else {							
+				var desc;
+				if (newHardware.total < 1)
+					desc = "Total amount of hardware must be positive.";
+				else 
+					desc = "Hardware with that name already exists in Library.";
+
+				var responseObject = {isSucceed: false, description: desc};
 				response.json(responseObject);
 			}
 		});
@@ -98,6 +107,7 @@ router.route('/addhardware')
 router.route('/deletehardware')
 	.post(parseUrlencoded, function (request, response){
 		var postedHardwareData = request.body;
+		
 		mongoModule.isHardwareExist(postedHardwareData.name, function(isHardwareExist){
 			if(isHardwareExist){
 				mongoModule.deleteHardware(postedHardwareData.name, function(isSuccess){
@@ -110,7 +120,69 @@ router.route('/deletehardware')
 					response.json(responseObject);
 				});		
 			} else {
-				var responseObject = {isSucceed: false, description: "Hardware with that mail does NOT exist in Library."};
+				var responseObject = {isSucceed: false, description: "Hardware with that name does NOT exist in Library."};
+				response.json(responseObject);
+			}
+		});
+	});
+
+router.route('/deducthardware')
+	.post(parseUrlencoded, function (request, response){
+		var hardwareData = request.body;
+		
+		var requestedHardwareCount 	= parseInt(hardwareData.count);
+		var requestedHardwareName 	= hardwareData.name;
+		
+		mongoModule.isHardwareAvailable(requestedHardwareName, requestedHardwareCount, function(isAvailable){
+			if(isAvailable  && requestedHardwareCount > 0){
+				mongoModule.deductHardware(requestedHardwareName, requestedHardwareCount, function(isSuccess){
+					if (isSuccess) {
+						var responseObject = {isSucceed: true, description: "Successfully deducted the hardware."};
+						response.json(responseObject);
+					} else {
+						var responseObject = {isSucceed: false, description: "Unable to deduct the hardware."};
+						response.json(responseObject);
+					}
+				});		
+			} else {
+				var desc;
+				if (requestedHardwareCount < 1)
+					desc = "Hardware amount must be positive.";
+				else 
+					desc = "This amount of the hardware does NOT exist in Library.";
+
+				var responseObject = {isSucceed: false, description: desc};
+				response.json(responseObject);
+			}
+		});
+	});
+	
+router.route('/incrementhardware')
+	.post(parseUrlencoded, function (request, response){
+		var hardwareData = request.body;
+		
+		var requestedHardwareCount 	= parseInt(hardwareData.count);
+		var requestedHardwareName 	= hardwareData.name;
+		
+		mongoModule.isHardwareExist(requestedHardwareName, function(isAvailable){
+			if(isAvailable && requestedHardwareCount > 0){
+				mongoModule.incrementHardware(requestedHardwareName, requestedHardwareCount, function(isSuccess){
+					if (isSuccess) {
+						var responseObject = {isSucceed: true, description: "Successfully incremented the hardware."};
+						response.json(responseObject);
+					} else {
+						var responseObject = {isSucceed: false, description: "Unable to increment the hardware."};
+						response.json(responseObject);
+					}
+				});		
+			} else {
+				var desc;
+				if (requestedHardwareCount < 1)
+					desc = "Hardware amount must be positive.";
+				else 
+					desc = "Hardware with that name does NOT exist in Library.";
+
+				var responseObject = {isSucceed: false, description: desc};
 				response.json(responseObject);
 			}
 		});

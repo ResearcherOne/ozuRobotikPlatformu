@@ -60,4 +60,40 @@ $(function(){
 			alert("Description:"+responseData.description+" isSucceed:"+responseData.isSucceed);
 		})
 	});
+	
+	$('#deductHardware').on('submit', function(event){
+		event.preventDefault();
+		var form = $(this);
+		var borrowData = form.serialize(); //Form verisini URL de gonderilecek formata cevirir.
+		$.ajax({
+			type: 'POST', url: '/hardwarelibrary/librarymanagement/deducthardware', data: borrowData
+		}).done(function(responseData){
+			form.trigger('reset');
+			alert("Description:"+responseData.description+" isSucceed:"+responseData.isSucceed);
+		})
+	});
+	
+	$('#incrementHardware').on('submit', function(event){
+		event.preventDefault();
+		var form = $(this);
+		var borrowData = form.serialize(); //Form verisini URL de gonderilecek formata cevirir.
+		$.ajax({
+			type: 'POST', url: '/hardwarelibrary/librarymanagement/incrementhardware', data: borrowData
+		}).done(function(responseData){
+			form.trigger('reset');
+			alert("Description:"+responseData.description+" isSucceed:"+responseData.isSucceed);
+		})
+	});
+	
+	$('#returnHardware').on('submit', function(event){
+		event.preventDefault();
+		var form = $(this);
+		var borrowData = form.serialize(); //Form verisini URL de gonderilecek formata cevirir.
+		$.ajax({
+			type: 'POST', url: '/hardwarelibrary/useractions/returnhardware', data: borrowData
+		}).done(function(responseData){
+			form.trigger('reset');
+			alert("Description:"+responseData.description+" isSucceed:"+responseData.isSucceed);
+		})
+	});
 });

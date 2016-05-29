@@ -1,14 +1,13 @@
 var express = require('express');
 var app = express();
 
-var myMiddleware = require('./models/authenticatorMiddleware')
 var hardwareLibraryRoute = require('./routes/hardwareLibraryRoute');
+var getUserProfile = require('./models/getUserProfileMiddleware');
 
-app.use(myMiddleware);
 app.use(express.static('public'));
-app.use('/hardwarelibrary', hardwareLibraryRoute); //isAuthenticated middleware will be used
+app.use('/hardwarelibrary', getUserProfile, hardwareLibraryRoute);
 
 
-app.listen(808, function(){
-  console.log('Listening on port 808 \n');
+app.listen(823, function(){
+  console.log('Listening on port 823 \n');
 });

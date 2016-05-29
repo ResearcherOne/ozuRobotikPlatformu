@@ -4,65 +4,24 @@ var mongoModule = require('../models/mongoModule');
 var bodyParser = require('body-parser');
 var parseUrlencoded = bodyParser.urlencoded({extended: false});
 
-/* Middleware stuff
-		var userMail = "birkan.kolcu@ozu.edu.tr";
-		mongoModule.getUser(userMail, function (userArray){
-			response.send(JSON.stringify(userArray));
-		});
-		
-	libraryUser {
-		fullName: "birkan kolcu"
-		userMail: "birkan.kolcu@ozu.edu.tr"
-		phone: "+90532..."
-		status: "librarian"
-		borrowLimit: 2
-		reputation: 8
-		hardwareBorrowed: [borrowData,borrowData,...]
-		borrowLog: [borrowLogData, borrowLogData,...]
-		addedDate: "properDateGoesHere"
-	}
-		borrowData {
-			hardwareID:
-			date:
-		}
-		
-		borrowLog {
-			hardwareID:
-			borrowDate:
-			returnDate:
-		}
-	Hardware {
-		name: "Arduino UNO",
-		description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
-		imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
-		tags: ["arduino", "development board", "uno"],
-		total: 4,
-		available: 1,
-		addedDate: "properDateGoesHere",
-	}
-*/	
 router.route('/borrowhardware')
 	.post(parseUrlencoded, function (request, response){
 		var hardwareData = request.body;
-		var libraryUser = {
-			fullName: "birkan kolcu",
-			userMail: "birkan.kolcu@ozu.edu.tr",
-			phone: "",
-			status: "",
-			borrowLimit: 5,
-			reputation: 2,
-			hardwareBorrowed: [],
-			addedDate: Date.now()
-		};
-		var hardwareBorrowedCount = libraryUser.hardwareBorrowed.length;
+		var libraryUser = request.libraryUser;
+		
+		var requestedHardwareCount 	= parseInt(hardwareData.count);
+		var requestedHardwareName 	= hardwareData.name;
+		
+		var hardwareBorrowedCount = mongoModule.getTotalHardwareBorrowedCount(libraryUser);
+		var hardwareBorrowedList = libraryUser.hardwareBorrowed;
 		var reputation = libraryUser.reputation;
 		var userMail = libraryUser.userMail;
 		
-		if(hardwareBorrowedCount < libraryUser.borrowLimit){
+		if(hardwareBorrowedCount+requestedHardwareCount <= libraryUser.borrowLimit && requestedHardwareCount != 0){
 			if (reputation > 0){
-				mongoModule.isHardwareAvailable(hardwareData.name, function(isAvailable){
+				mongoModule.isHardwareAvailable(requestedHardwareName, requestedHardwareCount, function(isAvailable){
 					if (isAvailable){
-						mongoModule.borrowHardware(userMail, hardwareData.name, function(isSucceed){
+						mongoModule.borrowHardware(userMail, requestedHardwareName, requestedHardwareCount, hardwareBorrowedList, function(isSucceed){
 							if (isSucceed){
 								var responseObject = {isSucceed: true, description: "Successfully borrowed the hardware."};
 								response.json(responseObject);
@@ -72,7 +31,7 @@ router.route('/borrowhardware')
 							}
 						});
 					} else {
-						var responseObject = {isSucceed: false, description: "Hardware is not available."};
+						var responseObject = {isSucceed: false, description: "This amount of the hardware is not available."};
 						response.json(responseObject);
 					}
 				});
@@ -81,13 +40,47 @@ router.route('/borrowhardware')
 				response.json(responseObject);
 			}
 		} else {
-			var responseObject = {isSucceed: false, description: "Hardware borrow limit is reached."};
+			var desc;
+			if (requestedHardwareCount == 0)
+				desc = "Cannot borrow zero amount of hardware.";
+			else 
+				desc = "Hardware borrow limit is reached.";
+
+			var responseObject = {isSucceed: false, description: desc};
 			response.json(responseObject);
 		}
 	});
 
 router.route('/returnhardware')
 	.post(parseUrlencoded, function (request, response){
+		var libraryUser = request.libraryUser;
+		var hardwareData = request.body;
+		
+		var userMail = libraryUser.userMail;
+		var hardwareBorrowedList = libraryUser.hardwareBorrowed;
+		
+		var requestedHardwareCount 	= parseInt(hardwareData.count);
+		var requestedHardwareName 	= hardwareData.name;
+		if(mongoModule.isAmountOfHardwareBorrowed(hardwareBorrowedList, requestedHardwareName, requestedHardwareCount) && requestedHardwareCount != 0) {
+			mongoModule.returnHardware(userMail, requestedHardwareName, requestedHardwareCount, hardwareBorrowedList, function(isSucceed){
+				if (isSucceed) {
+					var responseObject = {isSucceed: false, description: "Hardware is successfully returned."};
+					response.json(responseObject);
+				} else {
+					var responseObject = {isSucceed: false, description: "Hardware could not be returned."};
+					response.json(responseObject);
+				}
+			});
+		} else {
+			var desc;
+			if (requestedHardwareCount == 0)
+				desc = "Cannot return zero amount of hardware.";
+			else 
+				desc = "This amount of hardware is not borrowed by the user.";
+		
+			var responseObject = {isSucceed: false, description: desc};
+			response.json(responseObject);
+		}
 		
 	});
 

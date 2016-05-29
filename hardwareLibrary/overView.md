@@ -23,37 +23,6 @@
 				checkCloseDueDates
 				checkReportDay
 			-routes
-#Data Models
-	Hardware {
-		name: "Arduino UNO",
-		description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
-		imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
-		tags: ["arduino", "development board", "uno"],
-		total: 4,
-		available: 1,
-		addedDate: "properDateGoesHere",
-	}
-	libraryUser {
-		fullName: "birkan kolcu"
-		userMail: "birkan.kolcu@ozu.edu.tr"
-		phone: "+90532..."
-		status: "librarian"
-		borrowLimit: 2
-		reputation: 8
-		hardwareBorrowed: [borrowData,borrowData,...]
-		borrowLog: [borrowLogData, borrowLogData,...]
-		addedDate: "properDateGoesHere"
-	}
-		borrowData {
-			hardwareName:
-			date:
-		}
-		
-		borrowLog {
-			hardwareName:
-			borrowDate:
-			returnDate:
-		}
 
 #TODO
 	node_modules'u githubdan kaldir (best practice.)

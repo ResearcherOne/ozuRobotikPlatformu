@@ -43,8 +43,91 @@ function removeObject(collectionName, removeCriteria, callback)
 	});
 }
 
+/* Data Models
+libraryUser {
+	fullName: "birkan kolcu"
+	userMail: "birkan.kolcu@ozu.edu.tr"
+	phone: "+90532..."
+	status: "librarian"
+	borrowLimit: 2
+	reputation: 8
+	hardwareBorrowed: [borrowData,borrowData,...]
+	borrowLog: [borrowLogData, borrowLogData,...]
+	addedDate: "properDateGoesHere"
+}
+	borrowData {
+			hardwareName:
+			count:
+			date:
+	}
+	borrowLog {
+			hardwareName:
+			count:
+			borrowDate:
+			returnDate:
+	}
+
+Hardware {
+	name: "Arduino UNO",
+	description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
+	imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
+	tags: ["arduino", "development board", "uno"],
+	total: 4,
+	available: 1,
+	addedDate: "properDateGoesHere",
+}
+*/
+
+function getHardwareBorrowedDate(hardwareBorrowedList, requestedHardwareName) {
+	for (var i=0; i < hardwareBorrowedList.length; i++){
+		var borrowData = hardwareBorrowedList[i];
+		if (borrowData.hardwareName === requestedHardwareName)
+			return borrowData.date;
+	}
+	return null;
+}
+
+function isThisAmountOfHardwareBorrowed(hardwareBorrowedList, requestedHardwareName, requestedHardwareCount) {
+		for (var i=0; i < hardwareBorrowedList.length; i++){
+			var borrowData = hardwareBorrowedList[i];
+			if (borrowData.hardwareName === requestedHardwareName) {
+				var isAmountOfHardwareBorrowed = (borrowData.count >= requestedHardwareCount);
+				console.log("Here is the truth:"+isAmountOfHardwareBorrowed);
+				return isAmountOfHardwareBorrowed;
+			}
+		}
+		return false;
+	}
+
+function getHardwareBorrowedCount(hardwareBorrowedList, requestedHardwareName){
+	var borrowDataArray = hardwareBorrowedList
+		for(var i=0; i<borrowDataArray.length; i++){
+			var borrowData = borrowDataArray[i];
+			if (borrowData.hardwareName === requestedHardwareName)
+				return borrowData.count;
+		}
+		return 0;
+}
+
 // Public
 module.exports = {
+	getTotalHardwareBorrowedCount: function(libraryUser) //Is this function at the right place? Should i move it to another file?
+	{	//Should i take input as libraryUser itself or just needed part which is the hardwareBorrowed array.
+		var borrowDataArray = libraryUser.hardwareBorrowed;
+		var totalHardwareBorrowedCount = 0;
+		for(var i=0; i<borrowDataArray.length; i++){
+			var borrowData = borrowDataArray[i];
+			totalHardwareBorrowedCount += borrowData.count;
+		}
+		return totalHardwareBorrowedCount;
+	},
+
+	isAmountOfHardwareBorrowed: function(hardwareBorrowedList, requestedHardwareName, requestedHardwareCount) //Is this function at the right place? Should i move it to another file?
+	{
+		var hardwareBorrowedCount = getHardwareBorrowedCount(hardwareBorrowedList, requestedHardwareName);
+		return hardwareBorrowedCount >= requestedHardwareCount; 
+	},
+	
 	getHardwareArray: function(callback)
 	{
 		var hardwareList;
@@ -97,16 +180,16 @@ module.exports = {
 		});
 	},
 	
-	isHardwareAvailable: function(hardwareName, callback) 
+	isHardwareAvailable: function(requestedHardwareName, requestedHardwareCount, callback) 
 	{
-		activeDB.collection(mongoModuleConfig.hardwareCollectionName).find({"name": hardwareName}).toArray(function(err, result)
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).find({"name": requestedHardwareName}).toArray(function(err, result)
 		{
 			if (!err){
 				var isHardwareExistInCollection = (result.length != 0);
 				if (isHardwareExistInCollection) {
 					var hardware = result[0];
 					var availableHardwareCount = hardware.available;
-					var isAvailable = (availableHardwareCount > 0);
+					var isAvailable = (availableHardwareCount >= requestedHardwareCount);
 					callback (isAvailable);
 				} else {
 					var isAvailable = false;
@@ -119,14 +202,91 @@ module.exports = {
 		});
 	},
 	
-	borrowHardware: function(userMail, hardwareName, callback) 
+	borrowHardware: function(userMail, hardwareName, hardwareCount, hardwareBorrowedList, callback) //Should i keep taking hardwareBorrowList and userMail from libraryUser instead of libraryUser itself?
 	{
-		activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available":-1}}, function(err, result) {
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available":-hardwareCount}}, function(err, result) {
 			if (!err){
-				activeDB.collection(mongoModuleConfig.userCollectionName).update({"userMail": userMail}, {"$addToSet" : {"hardwareBorrowed" : {"hardwareName" : hardwareName , 'date' : Date.now()}} }, function(err, result) {
+				var isHardwareExistInBorrowedList = isThisAmountOfHardwareBorrowed(hardwareBorrowedList, hardwareName, 1);
+				if (isHardwareExistInBorrowedList) {
+					console.log(hardwareCount);
+					activeDB.collection(mongoModuleConfig.userCollectionName).findOneAndUpdate({"userMail": userMail, "hardwareBorrowed.hardwareName": hardwareName}, {$inc:{"hardwareBorrowed.$.count": parseInt(hardwareCount)}}, function(err, result){
+						if (!err){
+							var isSucceed = true;
+							callback(isSucceed);
+						} else {
+							var isSucceed = false;
+							callback(isSucceed);
+						}
+					});
+				} else {
+					var borrowData = {
+						"hardwareName" : hardwareName,
+						"count" : hardwareCount, 
+						'date' : Date.now()
+					};
+					activeDB.collection(mongoModuleConfig.userCollectionName).update({"userMail": userMail}, {"$addToSet" : {"hardwareBorrowed" : borrowData} }, function(err, result) {
+						if (!err){
+							var isSucceed = true;
+							callback(isSucceed);
+						} else {
+							var isSucceed = false;
+							callback(isSucceed);
+						}
+					});
+				}
+			} else {
+				var isSucceed = false;
+				callback(isSucceed);
+			}
+		});
+	},
+	
+	deductHardware: function(hardwareName, hardwareCount, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available":-hardwareCount, "total":-hardwareCount}}, function(err, result) {
+			var isSucceed = !err;
+			callback(isSucceed);
+		});
+	},
+	
+	incrementHardware: function(hardwareName, hardwareCount, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available":hardwareCount, "total":hardwareCount}}, function(err, result) {
+			var isSucceed = !err;
+			console.log(err);
+			callback(isSucceed);
+		});
+	},
+	
+	returnHardware: function(userMail, hardwareName, hardwareCount, hardwareBorrowedList, callback) //Should i keep taking hardwareBorrowList and userMail from libraryUser instead of libraryUser itself?
+	{
+		var hardwareBorrowedDate = getHardwareBorrowedDate(hardwareBorrowedList, hardwareName);
+		activeDB.collection(mongoModuleConfig.userCollectionName).update({"userMail": userMail}, {"$addToSet" : {"borrowLog" : {"hardwareName" : hardwareName, "count" : hardwareCount, "borrowDate" : hardwareBorrowedDate, 'returnDate' : Date.now()}} }, function(err, result) {
+			if (!err){
+				activeDB.collection(mongoModuleConfig.hardwareCollectionName).update({"name": hardwareName}, {$inc:{"available": hardwareCount}}, function(err, result) {
 					if (!err){
-						var isSucceed = true;
-						callback(isSucceed);
+						var isFullAmountReturned = (getHardwareBorrowedCount(hardwareBorrowedList, hardwareName) == hardwareCount);
+						if (isFullAmountReturned) {
+							activeDB.collection(mongoModuleConfig.userCollectionName).findOneAndUpdate({"userMail": userMail}, {$pull:{"hardwareBorrowed": {"hardwareName": hardwareName}}}, function(err, result){
+								if (!err){
+									var isSucceed = true;
+									callback(isSucceed);
+								} else {
+									var isSucceed = false;
+									callback(isSucceed);
+								}
+							});
+						} else {
+							activeDB.collection(mongoModuleConfig.userCollectionName).findOneAndUpdate({"userMail": userMail, "hardwareBorrowed.hardwareName": hardwareName}, {$inc:{"hardwareBorrowed.$.count": -hardwareCount}}, function(err, result){
+								if (!err){
+									var isSucceed = true;
+									callback(isSucceed);
+								} else {
+									var isSucceed = false;
+									callback(isSucceed);
+								}
+							});
+						}
 					} else {
 						var isSucceed = false;
 						callback(isSucceed);
@@ -160,7 +320,7 @@ module.exports = {
 			if (result.length != 0){
 				callback(result[0]);
 			} else {
-				callback([]);
+				callback(null);
 			}
 		});
 	},
