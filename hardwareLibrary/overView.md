@@ -28,7 +28,7 @@
 			-routes
 
 #TODO
-	cross-origin
++	cross-origin
 +	returnhardware rotasini tamamla
 	Authantication ekle (PassportJS, google plus)
 	node_modules'u githubdan kaldir (best practice.)

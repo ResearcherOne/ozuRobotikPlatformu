@@ -1,30 +1,6 @@
 var mongoModule = require('./mongoModule');
 
-module.exports = function(request, response, next){
-	var isAuth = true; //request.isAuth
-	request.userMail = "birkan.kolcu@ozu.edu.tr";
-	if (isAuth) {
-		mongoModule.getUser(request.userMail, function(user){
-			if (user !== null) {
-				request.libraryUser = user;
-				next();
-			} else {
-				var libraryUser = {
-						fullName: "anonymous",
-						userMail: "",
-						phone: "",
-						status: "anonymous",
-						borrowLimit: 0,
-						reputation: 0,
-						hardwareBorrowed: [],
-						addedDate: Date.now()
-				};
-				request.libraryUser = libraryUser;
-				next();
-			}
-		});
-	} else {
-		var libraryUser = {
+var anonymousUser = {
 				fullName: "anonymous",
 				userMail: "",
 				phone: "",
@@ -34,7 +10,45 @@ module.exports = function(request, response, next){
 				hardwareBorrowed: [],
 				addedDate: Date.now()
 			};
-		request.libraryUser = libraryUser;
+			
+var debugUser = {
+				fullName: "anonymous",
+				userMail: "",
+				phone: "",
+				status: "librarian",
+				borrowLimit: 0,
+				reputation: 0,
+				hardwareBorrowed: [],
+				addedDate: Date.now()
+			};
+
+module.exports = function(request, response, next){
+	if (typeof request.session.token !== 'undefined') {
+		authModule.isValidToken(token, function(isValid){
+			if (isValid) {
+				authModule.getUserMail(request.session.token,function(result) {
+					if (result) {
+						request.userMail = result;
+						mongoModule.getUser(request.userMail, function(user){
+							if (user !== null) {
+								request.libraryUser = user;
+							} else {
+								request.libraryUser = anonymousUser;
+							}
+							next();
+						});
+					} else {
+						request.libraryUser = anonymousUser;
+						next();
+					}
+				});
+			} else {
+				request.libraryUser = anonymousUser;
+				next();
+			}
+		});
+	} else {
+		request.libraryUser = anonymousUser;
 		next();
 	}
 };

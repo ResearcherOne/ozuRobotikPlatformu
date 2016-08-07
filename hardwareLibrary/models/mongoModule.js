@@ -7,7 +7,8 @@ var activeDB;
 
 var mongoModuleConfig = {
 	hardwareCollectionName: "hardwareCollection",
-	userCollectionName: "userCollection"
+	userCollectionName: "userCollection",
+	sensitiveCollection: "sensitiveCollection"
 };
 
 mongoClient.connect(url, function(err, db) {
@@ -67,15 +68,26 @@ libraryUser {
 			returnDate:
 	}
 
+	sensitiveCollection[{
+		username:
+		password:
+		userMail:
+	}]
+
 Hardware {
+	hardwareID: 1
 	name: "Arduino UNO",
 	description: "This well-known development board has taken over the world. If you did not use this you should get into the Arduino world!",
-	imageLink: "http://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
+	imageLink: "h ttp://g02.a.alicdn.com/kf/HTB1iMyHLXXXXXcGXXXXq6xXFXXXx/UNO-R3-MEGA328P-ATMEGA16U2-for-Arduino-Compatible-with-the-cable.jpg_220x220.jpg",
 	tags: ["arduino", "development board", "uno"],
 	total: 4,
 	available: 1,
 	addedDate: "properDateGoesHere",
 }
+borrowRequest{
+	
+}
+
 */
 
 function getHardwareBorrowedDate(hardwareBorrowedList, requestedHardwareName) {
@@ -359,8 +371,34 @@ module.exports = {
 				var isUserExistInDatabase = (result.length != 0);
 				callback(isUserExistInDatabase);
 			} else {
-				var isUserExistInDatabase = true;
+				var isUserExistInDatabase = false;
 				callback(isUserExistInDatabase);
+			}
+		});
+	},
+	
+	isUserActivated: function(inputUsername, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.sensitiveCollection).find({username: inputUsername}).toArray(function(err, result)
+		{
+			if (!err){
+				var isUsernameExist = (result.length != 0);
+				callback(isUsernameExist);
+			} else {
+				var isUsernameExist = false;
+				callback(isUsernameExist);
+			}
+		});
+	},
+	
+	getSensitiveInformation: function(inputUsername, callback) 
+	{
+		activeDB.collection(mongoModuleConfig.sensitiveCollection).find({username: inputUsername}).toArray(function(err, result)
+		{
+			if (!err){
+				callback(result);
+			} else {
+				callback(null);
 			}
 		});
 	}

@@ -3,6 +3,7 @@ var router = express.Router();
 
 var libraryManagementRoute = require('./libraryManagementRoute');
 var userActionsRoute = require('./userActionsRoute');
+var authRoute = require('./authRoute');
 
 function isUserMiddleware(request, response, next){
 	var libraryUser = request.libraryUser;
@@ -26,5 +27,6 @@ function isLibrarianMiddleware(request, response, next){
 
 router.use('/librarymanagement', isLibrarianMiddleware, libraryManagementRoute);
 router.use('/useractions', isUserMiddleware, userActionsRoute);
+router.use('/auth', authRoute);
 
 module.exports = router;
