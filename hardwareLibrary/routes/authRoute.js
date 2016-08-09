@@ -10,23 +10,18 @@ router.route('/requestToken')
 	.post(parseUrlencoded, function (request, response){
 		var authData = request.body;
 		var libraryUser = request.libraryUser;
-		var userMail = authData.username;
-		
+		var userMail = authData.userMail;
 		if (libraryUser.status === "anonymous"){ //make time limit for token request per mail
 			mongoModule.isUserExist(userMail, function(isUserExist){
-				if(isUserExist && authModule.isOzuMail(userMail)) {
+				var isOzuMail = authModule.isOzuMail(userMail);
+				if(isUserExist && isOzuMail) {
 					var token = authModule.generateToken();
-					authModule.saveLoginToken(token, userMail, function(err, result){
-						if(!err) {
-							authModule.sendLoginLink(token, userMail);
-							authModule.setTokenExpirationTime(token, 120); //Token will expire in 120 minutes.
-							var responseObject = {isSucceed: true, description: "Login link is sent to your mail."};
-							response.json(responseObject);	
-						} else {
-							var responseObject = {isSucceed: true, description: "Error occoured during obtaining token."};
-							response.json(responseObject);	
-						}
-					});
+					
+					authModule.saveLoginToken(token, userMail);
+					authModule.sendLoginLink(token, userMail);
+					authModule.setTokenExpirationTime(token, 120); //Token will expire in 120 minutes.
+					var responseObject = {isSucceed: true, description: "Login link is sent to your mail."};
+					response.json(responseObject);	
 				} else {
 					var responseObject = {isSucceed: false, description: "Invalid user."};
 					response.json(responseObject);

@@ -4,7 +4,7 @@ var mailerModule = require('../models/mailerModule');
 
 module.exports = {
 	generateToken: function(){
-		return uid(16);
+		return tokenGenerator(16);
 	},
 	saveLoginToken: function(token, userMail, callback){
 		redisWrapper.setValue(token, userMail, function(err, result){
@@ -28,17 +28,18 @@ module.exports = {
 	},
 	sendLoginLink: function(token, userMail){
 		var loginLink = "http://birkankolcu.com/auth/login/"+token //href yolla, gorunusu Click to Login olsun
-		mailerModule.sendMail(userMail, "ozudevelopers@gmail.com", "Your login link for hardware library.", loginLink)
+		console.log("IMA HERE");
+		mailerModule.sendMail(userMail, "birkan.kolcu@ozudevelopers.com", "Your login link for hardware library.", loginLink);
 	},
 	setTokenExpirationTime: function(token, expirationTimeInMinutes){
 		redisWrapper.setExpirationTime(token, expirationTimeInMinutes*60);
 	},
 	isOzuMail: function(mailAddress){
-		var mailAddress = str.toString().split("@");
-		var fullName = mailAddress[0];
-		var domain = mailAddress[0];
+		var parsedMail = mailAddress.toString().split("@");
+		var fullName = parsedMail[0];
+		var domain = parsedMail[1];
 		var isValidDomain = domain === "ozu.edu.tr";
-		var isValidLength = mailAddress.length == 2;
+		var isValidLength = parsedMail.length == 2;
 		return isValidDomain && isValidLength;
 	}
 };
